@@ -10,5 +10,5 @@
 
 1. NPM install 
 2. copy script .sql paste ke GUI or terminal mysql 
-3. node 4.js <username mysql> <password mysql> 
+3. node 4.js [username mysql] [password mysql] 
 4. example : node 4.js agnynureza 12345
