@@ -37,7 +37,6 @@ app.get('/', function (req, res, next) {
 })
 
 app.get('/heroes', function (req, res, next) {
-    let name = req.params.name
     connection.query(`SELECT hero.id, hero.name, hero.type_id, hero.photo, type.name as type
         FROM heroes_tb as hero 
         JOIN type_tb as type on hero.type_id = type.id`,(err, rows) => {
@@ -50,20 +49,31 @@ app.get('/heroes', function (req, res, next) {
     });
 });
 
-// app.get('/heroes/:type', function (req, res, next) {
-//     let type = req.params.type
-//     connection.query(`SELECT hero.id, hero.name, hero.type_id, hero.photo, type.name as type
-//         FROM heroes_tb as hero 
-//         JOIN type_tb as type on hero.type_id = type.id
-//         WHERE type.name = '${type}'`,(err, rows) => {
-//         if(err){
-//             console.log(err)
-//         }else{
-//             console.log('Data Heroes received from Db');
-//             res.render('4list', {data : rows})
-//         }
-//     });
-// });
+app.get('/types', function (req, res, next) {
+    connection.query(`SELECT distinct(name) from type_tb`,(err, rows) => {
+        if(err){
+            console.log(err)
+        }else{
+            console.log('Data Heroes types received from Db');
+            res.render('4types', {data : rows})
+        }
+    });
+});
+
+app.get('/heroes/:type', function (req, res, next) {
+    let type = req.params.type
+    connection.query(`SELECT hero.id, hero.name, hero.type_id, hero.photo, type.name as type
+        FROM heroes_tb as hero 
+        JOIN type_tb as type on hero.type_id = type.id
+        WHERE type.name = '${type}'`,(err, rows) => {
+        if(err){
+            console.log(err)
+        }else{
+            console.log('Data Heroes received from Db');
+            res.render('4list', {data : rows})
+        }
+    });
+});
 
 app.get('/add', function (req, res, next) {
     res.render('4add')
@@ -117,6 +127,24 @@ app.post('/heroes/edit', function (req, res, next) {
 
 app.get('/delete', function (req, res, next) {
     res.render('4delete');
+});
+
+app.post('/heroes/delete', function (req, res, next) {
+    let id = req.body.id
+    let sql = `select * from heroes_tb where id = ${id}`
+    let sqlHeroes = `delete from heroes_tb where id = ${id}`
+
+    connection.query(sql,(err,row)=>{
+        console.log(row)
+        if(err){
+            console.log(err)
+        }else{
+            let sqlType = `delete from type_tb where id=${row[0].type_id}`
+            connection.query(sqlHeroes,(err)=>{console.log(err)})
+            connection.query(sqlType,(err)=>{console.log(err)})
+            res.redirect('/')
+        } 
+    })
 });
 
 app.listen(port, function (err) {
