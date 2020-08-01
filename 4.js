@@ -1,10 +1,13 @@
 const express = require('express');
 const app = express();
-const router = express.Router();
+const path = require('path')
+const createError = require('http-errors')
 const mysql = require('mysql');
+const args = process.argv.slice(2);
+const port = 3000
 
 //view engine setup 
-app.set();
+app.set('views', path.join(__dirname, ''));
 app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({
@@ -13,48 +16,89 @@ app.use(express.urlencoded({
 
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'user',
-  password: 'password', // mysql local password 
-  database: 'dumbways'
+    host: 'localhost',
+    user: args[0] || 'agnynureza', //local username
+    password: args[1] || '123456', //local password 
+    database: 'dumbways'
 });
 
 connection.connect((err) => {
-  if (err) throw err;
-  console.log('Connected!');
+    if (err) throw (err)
+    console.log('DB Connection established !');
 });
+
 
 
 //CRUD
-router.get('/hero/:id', function(req, res, next) {
-    res.send('respond with a resource');
+app.get('/', function (req, res, next) {
+    res.render('4home', {
+        title: "DumbWays heroes"
+    })
+})
+
+app.get('/heroes', function (req, res, next) {
+    let name = req.params.name
+    connection.query(`SELECT hero.id, hero.name, hero.type_id, hero.photo, type.name as type
+        FROM heroes_tb as hero 
+        JOIN type_tb as type on hero.type_id = type.id`,(err, rows) => {
+        if(err){
+            console.log(err)
+        }else{
+            console.log('Data Heroes received from Db');
+            res.render('4list', {data : rows})
+        }
+    });
 });
 
-router.post('/hero', function(req, res, next) {
-    res.send('respond with a resource');
+app.get('/heroes/:type', function (req, res, next) {
+    let type = req.params.type
+    connection.query(`SELECT hero.id, hero.name, hero.type_id, hero.photo, type.name as type
+        FROM heroes_tb as hero 
+        JOIN type_tb as type on hero.type_id = type.id
+        WHERE type.name = '${type}'`,(err, rows) => {
+        if(err){
+            console.log(err)
+        }else{
+            console.log('Data Heroes received from Db');
+            res.render('4list', {data : rows})
+        }
+    });
 });
 
-router.put('/hero', function(req, res, next) {
-    res.send('respond with a resource');
+app.get('/add', function (req, res, next) {
+    res.render('4add')
 });
 
-router.delete('/hero/:id', function(req, res, next) {
-    res.send('respond with a resource');
-});
+app.post('/heroes/add', function(req,res,next){
+    let name = req.body.name
+    let type = req.body.type
+    let pic = req.body.picture
+    connection.query(`INSERT INTO type_tb (name) VALUES('${type}')`, (err,row)=>{
+        if(err){
+            console.log(err)
+        }else{
+            connection.query(`INSERT INTO heroes_tb (name, type_id, photo) VALUES ('${name}', ${row.insertId}, '${pic}')`, (err,row)=>{
+                if(err){
+                    console.log(err)
+                }else{
+                    res.redirect('/')
+                }
+            })
+        }
+    })
   
+})
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    next(createError(404));
-});
+// router.put('/hero', function (req, res, next) {
+//     res.send('respond with a resource');
+// });
 
-// error handler
-app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
+// router.delete('/hero/:id', function (req, res, next) {
+//     res.send('respond with a resource');
+// });
 
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
-});
+
+app.listen(port, function (err) {
+    if (err) throw err
+    console.log('Server Up Capt !')
+})

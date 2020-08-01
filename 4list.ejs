@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DumbWays Heroes</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  </head>
+  <body>
+    <table class = 'table'>
+      <tr>
+          <th>No</th>
+          <th>Heroes Name</th>
+          <th>Heroes Type </th>
+          <th>Heroes Picture</th>
+      </tr>
+        <% data.forEach((row,index) => { %>
+        <tr>
+          <td><%= index+1       %></td>
+          <td><%= row.name%></td>
+          <td><%= row.type %></td>
+          <td><a href="https://www.google.com/imgres?imgurl=https%3A%2F%2Fwww.dotafire.com%2Fimages%2Fsocial%2Fheroes%2Fzeus.jpg&imgrefurl=https%3A%2F%2Fwww.dotafire.com%2Fdota-2%2Fhero%2Fzeus-34&tbnid=IhHxN2MTOJ6JqM&vet=12ahUKEwjMzZaFyvnqAhWygksFHV4YBCYQMygFegUIARC3AQ..i&docid=T4k2x1sWR3dkLM&w=1040&h=520&q=zeus%20dota&safe=strict&">klik for Heroes <%= row.name%> picture</a></td>
+        </tr>
+        <% }) %>
+      </table>
+  </body>
+</html>
