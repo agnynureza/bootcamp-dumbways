@@ -1,3 +1,11 @@
+/*
+1
+1 1
+1 2 1
+1 3 3 1
+1 4 6 4 1
+*/
+
 function pascal_function(n) {
     let result = []
     for (let i = 0; i <= n; i++) {
@@ -15,11 +23,4 @@ function pascal_function(n) {
 }
 
 pascal_function(4)
-/*
-1
-1 1
-1 2 1
-1 3 3 1
-1 4 6 4 1
-*/
 pascal_function(10)
