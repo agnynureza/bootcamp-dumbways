@@ -6,6 +6,8 @@ const mysql = require('mysql');
 const args = process.argv.slice(2);
 const port = 3000
 
+console.log(args)
+
 //view engine setup 
 app.set('views', path.join(__dirname, ''));
 app.set('view engine', 'ejs');
