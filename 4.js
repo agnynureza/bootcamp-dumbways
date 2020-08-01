@@ -50,20 +50,20 @@ app.get('/heroes', function (req, res, next) {
     });
 });
 
-app.get('/heroes/:type', function (req, res, next) {
-    let type = req.params.type
-    connection.query(`SELECT hero.id, hero.name, hero.type_id, hero.photo, type.name as type
-        FROM heroes_tb as hero 
-        JOIN type_tb as type on hero.type_id = type.id
-        WHERE type.name = '${type}'`,(err, rows) => {
-        if(err){
-            console.log(err)
-        }else{
-            console.log('Data Heroes received from Db');
-            res.render('4list', {data : rows})
-        }
-    });
-});
+// app.get('/heroes/:type', function (req, res, next) {
+//     let type = req.params.type
+//     connection.query(`SELECT hero.id, hero.name, hero.type_id, hero.photo, type.name as type
+//         FROM heroes_tb as hero 
+//         JOIN type_tb as type on hero.type_id = type.id
+//         WHERE type.name = '${type}'`,(err, rows) => {
+//         if(err){
+//             console.log(err)
+//         }else{
+//             console.log('Data Heroes received from Db');
+//             res.render('4list', {data : rows})
+//         }
+//     });
+// });
 
 app.get('/add', function (req, res, next) {
     res.render('4add')
@@ -89,14 +89,35 @@ app.post('/heroes/add', function(req,res,next){
   
 })
 
-// router.put('/hero', function (req, res, next) {
-//     res.send('respond with a resource');
-// });
+app.get('/edit', function (req, res, next) {
+    res.render('4edit');
+});
 
-// router.delete('/hero/:id', function (req, res, next) {
-//     res.send('respond with a resource');
-// });
+app.post('/heroes/edit', function (req, res, next) {
+    let name = req.body.name
+    let type = req.body.type
+    let pic = req.body.picture
+    let id = req.body.id
+    let sqlHeroes = `UPDATE heroes_tb SET photo='${pic}', name = '${name}' WHERE id=${id}`
+    let sqlDetail = `SELECT * from heroes_tb where id = ${id}`
+    
+    connection.query(sqlDetail,(err,row)=>{
+        if (err){
+            res.redirect('/')
+        }else{
+            console.log(row)
+            let sqlType = `UPDATE type_tb SET name='${type}' WHERE id=${row[0].type_id}`
+            console.log(sqlType)
+            connection.query(sqlHeroes,function(err){if(err) console.log(err)})
+            connection.query(sqlType,function(err){if(err) console.log(err)})
+            res.redirect('/')
+        }
+    })
+});
 
+app.get('/delete', function (req, res, next) {
+    res.render('4delete');
+});
 
 app.listen(port, function (err) {
     if (err) throw err
